@@ -205,7 +205,7 @@
       <div class="panel-label">最近会话记录（最新50条）</div>
       <div id="sess-wrap">
         <table class="sess-table">
-          <thead><tr><th>时间</th><th>状态</th><th>结果</th><th>分享</th><th>耗时</th><th>设备</th></tr></thead>
+          <thead><tr><th>时间</th><th>状态</th><th>结果</th><th>分享</th><th>耗时</th><th>设备</th></thead>
           <tbody id="sess-body"></tbody>
         </table>
       </div>
@@ -230,7 +230,7 @@
           <div>
             <div class="iter-title">v1.0 · 上线初版</div>
             <div class="iter-desc">10题测试 + 6种AI人格结果 + 分享功能</div>
-            <div class="iter-meta">events: quiz_start / q_answer / result_view / share_click / drop / retry_click</div>
+            <div class="iter-meta">events: quiz_start / q_answer / result_view / share_click</div>
           </div>
         </div>
         <div class="iter-item">
@@ -238,7 +238,7 @@
           <div>
             <div class="iter-title">v1.1 · Supabase 版本上线</div>
             <div class="iter-desc">全用户数据实时同步云端，后台可跨设备查看，AI智能分析接入</div>
-            <div class="iter-meta">新增: setup wizard / supabase sync / admin dashboard / claude analysis</div>
+            <div class="iter-meta">新增: supabase sync / admin dashboard / claude analysis</div>
           </div>
         </div>
         <div class="iter-item" id="v12-item" style="opacity:0.3">
@@ -261,17 +261,22 @@
 </div>
 
 <script>
-// ══ AUTH & CONFIG ══
+// ══ SUPABASE 配置（与 index.html 保持一致）══
+const SB_URL = 'https://kzinhbfeilyshsfpfbsm.supabase.co';
+const SB_KEY = 'sb_publishable_Iaax24ehcPXHi_3UHK7kFg_Ye32eIKj';
+
+// 常量
 const ADMIN_PWD = 'aiq2024';
-const CFG_KEY = 'aiq_config';
-const LOCAL_KEY = 'aiq_events';
+const LOCAL_KEY = 'aiq_ev';  // 与 index.html 中的 localStorage key 一致
 const aiNames = ["ChatGPT","Claude","Kimi","DeepSeek","豆包","千问"];
 const aiColors = ["#10a37f","#c87c4a","#4a8bc8","#4ac8c8","#e05a7a","#7ab848"];
 const SHARE_METHODS = ['copy','link','weibo','screenshot'];
 const SHARE_LABELS = ['复制文字','复制链接','微博','截图'];
 
-function getCfg(){try{return JSON.parse(localStorage.getItem(CFG_KEY))||{};}catch(e){return{};}}
+// 用于存储全局统计
+let currentStats = null;
 
+// 登录验证
 function checkPwd(){
   const v=document.getElementById('pwd-input').value;
   if(v===ADMIN_PWD){
@@ -284,242 +289,386 @@ function checkPwd(){
   }
 }
 
-// auto-login via URL param
+// URL 参数自动登录
 if(new URLSearchParams(location.search).get('admin')===ADMIN_PWD){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('admin-screen').style.display='block';
   setTimeout(()=>{loadData();setInterval(loadData,30000);},100);
 }
 
-// ══ DATA LOADING ══
+// ══ 从 Supabase 加载数据 ══
 async function loadData(){
   document.getElementById('last-upd').textContent=new Date().toLocaleTimeString('zh-CN');
-  const cfg=getCfg();
-  let events=[], fromSB=false;
-
-  if(cfg.url && cfg.key){
-    try{
-      const res=await fetch(
-        `${cfg.url}/rest/v1/events?select=*&order=ts.desc&limit=5000`,
-        {headers:{'apikey':cfg.key,'Authorization':`Bearer ${cfg.key}`}}
-      );
-      if(res.ok){
-        const rows=await res.json();
-        events=rows.map(r=>({...r.data, _id:r.id, _created:r.created_at}));
-        fromSB=true;
-      }
-    }catch(e){}
-  }
-
-  if(!fromSB){
-    try{events=JSON.parse(localStorage.getItem(LOCAL_KEY)||'[]');}catch(e){events=[];}
-  }
-
   const badge=document.getElementById('data-src-badge');
-  if(fromSB){badge.textContent='Supabase 实时';badge.className='data-src src-sb';}
-  else{badge.textContent='本机缓存';badge.className='data-src src-local';}
-
-  if(!events.length){renderEmpty();return;}
+  
+  let events = [];
+  let fromSB = false;
+  
+  try {
+    // 从 Supabase 读取 events 表数据
+    const res = await fetch(
+      `${SB_URL}/rest/v1/events?select=*&order=created_at.desc&limit=5000`,
+      {
+        headers: {
+          'apikey': SB_KEY,
+          'Authorization': `Bearer ${SB_KEY}`
+        }
+      }
+    );
+    
+    if (res.ok) {
+      const rows = await res.json();
+      // 转换数据格式，将 data 字段中的内容展开
+      events = rows.map(row => ({
+        event: row.event,
+        session: row.session,
+        ts: row.ts,
+        created_at: row.created_at,
+        // 将 data JSON 中的字段展开到顶层
+        ...(row.data || {}),
+        // 保留原始 data 对象
+        _raw_data: row.data
+      }));
+      fromSB = true;
+    } else {
+      console.error('Supabase 查询失败:', res.status);
+    }
+  } catch(e) {
+    console.error('Supabase 连接失败:', e);
+  }
+  
+  // 如果 Supabase 没数据，尝试从 localStorage 读取（兼容旧数据）
+  if (!fromSB || events.length === 0) {
+    try {
+      const localEvents = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
+      if (localEvents.length > 0) {
+        events = localEvents;
+        fromSB = false;
+      }
+    } catch(e) {}
+  }
+  
+  if (fromSB && events.length > 0) {
+    badge.textContent = 'Supabase 实时';
+    badge.className = 'data-src src-sb';
+  } else if (events.length > 0) {
+    badge.textContent = '本机缓存';
+    badge.className = 'data-src src-local';
+  } else {
+    badge.textContent = '暂无数据';
+    badge.className = 'data-src';
+  }
+  
+  if (!events.length) {
+    renderEmpty();
+    return;
+  }
+  
   processAndRender(events);
 }
 
 function renderEmpty(){
-  ['kv-pv','kv-cr','kv-sr','kv-at'].forEach(id=>{document.getElementById(id).textContent='0';});
-  document.getElementById('sess-body').innerHTML='<tr><td colspan="6" style="color:var(--text-faint);padding:24px 0;text-align:center;">暂无数据 · 先让几个朋友来测试</td></tr>';
+  ['kv-pv','kv-cr','kv-sr','kv-at'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.textContent = '0';
+  });
+  const sessBody = document.getElementById('sess-body');
+  if(sessBody) sessBody.innerHTML='<tr><td colspan="6" style="color:var(--text-faint);padding:24px 0;text-align:center;">暂无数据 · 先让几个朋友来测试</td></tr>';
+  const aiDist = document.getElementById('ai-dist');
+  if(aiDist) aiDist.innerHTML = '<div class="empty-state">暂无数据</div>';
+  const sharePills = document.getElementById('share-pills');
+  if(sharePills) sharePills.innerHTML = '<div class="empty-state">暂无分享数据</div>';
+  const optHeatmap = document.getElementById('opt-heatmap');
+  if(optHeatmap) optHeatmap.innerHTML = '<div class="empty-state">暂无答题数据</div>';
 }
 
-// ══ PROCESS ══
+// ══ 核心数据处理和渲染 ══
 function processAndRender(events){
-  // group by session
-  const sessMap={};
-  events.forEach(ev=>{
+  // 按 session 分组
+  const sessMap = {};
+  events.forEach(ev => {
     if(!ev.session) return;
-    if(!sessMap[ev.session]) sessMap[ev.session]=[];
+    if(!sessMap[ev.session]) sessMap[ev.session] = [];
     sessMap[ev.session].push(ev);
   });
-  const sArr=Object.values(sessMap);
-
-  const pvS=sArr.length;
-  const startedS=sArr.filter(s=>s.some(e=>e.event==='quiz_start'));
-  const completedS=sArr.filter(s=>s.some(e=>e.event==='result_view'));
-  const sharedS=sArr.filter(s=>s.some(e=>e.event==='share_click'));
-  const mid5S=sArr.filter(s=>s.filter(e=>e.event==='q_answer').some(e=>e.q>=4));
-
-  // KPIs
-  document.getElementById('kv-pv').textContent=pvS;
-  document.getElementById('kv-pv-sub').textContent=startedS.length+' 人开始答题';
-  const cr=startedS.length?Math.round(completedS.length/startedS.length*100):0;
-  const sr=completedS.length?Math.round(sharedS.length/completedS.length*100):0;
-  const el_cr=document.getElementById('kv-cr');
-  el_cr.textContent=cr+'%';
-  el_cr.className='kpi-val '+(cr>=60?'green':cr>=30?'accent':'red');
-  document.getElementById('kv-cr-sub').textContent=completedS.length+' / '+startedS.length;
-  document.getElementById('kv-sr').textContent=sr+'%';
-  document.getElementById('kv-sr-sub').textContent=sharedS.length+' 次分享';
-  const tEvents=events.filter(e=>e.event==='result_view'&&e.total_ms);
-  const avgT=tEvents.length?Math.round(tEvents.reduce((a,e)=>a+e.total_ms,0)/tEvents.length/1000):0;
-  document.getElementById('kv-at').textContent=avgT||'—';
-
-  // Funnel
-  const base=pvS||1;
-  [[pvS,'f0','fv0'],[startedS.length,'f1','fv1'],[mid5S.length,'f2','fv2'],[completedS.length,'f3','fv3'],[sharedS.length,'f4','fv4']].forEach(([n,fId,vId])=>{
-    document.getElementById(fId).style.width=Math.round(n/base*100)+'%';
-    document.getElementById(vId).textContent=n+'人 ('+Math.round(n/base*100)+'%)';
+  const sArr = Object.values(sessMap);
+  
+  // 各阶段统计
+  const pvS = sArr.length;  // 总访问会话数
+  const startedS = sArr.filter(s => s.some(e => e.event === 'quiz_start'));
+  const completedS = sArr.filter(s => s.some(e => e.event === 'result_view'));
+  const sharedS = sArr.filter(s => s.some(e => e.event === 'share_click'));
+  // 答到第5题（q_index >= 4，因为 q 从0开始）
+  const mid5S = sArr.filter(s => s.filter(e => e.event === 'q_answer').some(e => (e.q || 0) >= 4));
+  
+  // KPI 更新
+  document.getElementById('kv-pv').textContent = pvS;
+  document.getElementById('kv-pv-sub').textContent = startedS.length + ' 人开始答题';
+  
+  const cr = startedS.length ? Math.round(completedS.length / startedS.length * 100) : 0;
+  const sr = completedS.length ? Math.round(sharedS.length / completedS.length * 100) : 0;
+  
+  const el_cr = document.getElementById('kv-cr');
+  el_cr.textContent = cr + '%';
+  el_cr.className = 'kpi-val ' + (cr >= 60 ? 'green' : (cr >= 30 ? 'accent' : 'red'));
+  document.getElementById('kv-cr-sub').textContent = completedS.length + ' / ' + startedS.length;
+  document.getElementById('kv-sr').textContent = sr + '%';
+  document.getElementById('kv-sr-sub').textContent = sharedS.length + ' 次分享';
+  
+  // 平均答题时长（从 result_view 的 total_ms 获取）
+  const tEvents = events.filter(e => e.event === 'result_view' && e.total_ms);
+  const avgT = tEvents.length ? Math.round(tEvents.reduce((a, e) => a + e.total_ms, 0) / tEvents.length / 1000) : 0;
+  document.getElementById('kv-at').textContent = avgT || '—';
+  
+  // 漏斗
+  const base = pvS || 1;
+  const funnelData = [
+    [pvS, 'f0', 'fv0'],
+    [startedS.length, 'f1', 'fv1'],
+    [mid5S.length, 'f2', 'fv2'],
+    [completedS.length, 'f3', 'fv3'],
+    [sharedS.length, 'f4', 'fv4']
+  ];
+  funnelData.forEach(([n, fId, vId]) => {
+    const fillEl = document.getElementById(fId);
+    const valEl = document.getElementById(vId);
+    if(fillEl) fillEl.style.width = Math.round(n / base * 100) + '%';
+    if(valEl) valEl.textContent = n + '人 (' + Math.round(n / base * 100) + '%)';
   });
-
-  // Drop by Q
-  const dropByQ=new Array(10).fill(0), reachByQ=new Array(10).fill(0);
-  sArr.forEach(s=>{
-    const drop=s.find(e=>e.event==='drop');
-    if(drop) dropByQ[Math.min(drop.at_q||0,9)]++;
-    const ans=s.filter(e=>e.event==='q_answer');
-    const maxQ=ans.length?Math.max(...ans.map(e=>e.q||0)):-1;
-    for(let q=0;q<=maxQ&&q<10;q++) reachByQ[q]++;
+  
+  // 各题流失分布
+  const dropByQ = new Array(10).fill(0);
+  const reachByQ = new Array(10).fill(0);
+  sArr.forEach(s => {
+    // 查找 drop 事件
+    const drop = s.find(e => e.event === 'drop');
+    if(drop && drop.at_q !== undefined) {
+      dropByQ[Math.min(drop.at_q, 9)]++;
+    }
+    // 计算到达每题的人数
+    const answers = s.filter(e => e.event === 'q_answer');
+    const maxQ = answers.length ? Math.max(...answers.map(e => e.q || 0)) : -1;
+    for(let q = 0; q <= maxQ && q < 10; q++) reachByQ[q]++;
   });
-  const maxDrop=Math.max(...dropByQ,1);
-  let dHtml='',dlHtml='';
-  dropByQ.forEach((d,i)=>{
-    const pct=reachByQ[i]?Math.round(d/reachByQ[i]*100):0;
-    const h=Math.round(d/maxDrop*80)+4;
-    const color=pct>30?'var(--red)':pct>15?'var(--accent)':'var(--surface2)';
-    dHtml+=`<div class="bar-col" style="height:${h}px;background:${color};" data-tip="Q${i+1}: ${d}人流失 (${pct}%)"></div>`;
-    dlHtml+=`<span class="bar-lbl">Q${i+1}</span>`;
+  
+  const maxDrop = Math.max(...dropByQ, 1);
+  let dHtml = '', dlHtml = '';
+  dropByQ.forEach((d, i) => {
+    const pct = reachByQ[i] ? Math.round(d / reachByQ[i] * 100) : 0;
+    const h = Math.round(d / maxDrop * 80) + 4;
+    const color = pct > 30 ? 'var(--red)' : (pct > 15 ? 'var(--accent)' : 'var(--surface2)');
+    dHtml += `<div class="bar-col" style="height:${h}px;background:${color};" data-tip="Q${i+1}: ${d}人流失 (${pct}%)"></div>`;
+    dlHtml += `<span class="bar-lbl">Q${i+1}</span>`;
   });
-  document.getElementById('drop-chart').innerHTML=dHtml;
-  document.getElementById('drop-labels').innerHTML=dlHtml;
-  const wQ=dropByQ.indexOf(Math.max(...dropByQ));
-  document.getElementById('drop-insight').textContent=dropByQ[wQ]>0?`最高流失：Q${wQ+1}（${dropByQ[wQ]}人流失），建议重点检查该题`:'暂无足够流失数据';
-
-  // AI dist
-  const rDist=new Array(6).fill(0);
-  events.filter(e=>e.event==='result_view'&&e.winner).forEach(e=>{
-    const idx=aiNames.indexOf(e.winner);if(idx>=0)rDist[idx]++;
+  const dropChart = document.getElementById('drop-chart');
+  const dropLabels = document.getElementById('drop-labels');
+  if(dropChart) dropChart.innerHTML = dHtml;
+  if(dropLabels) dropLabels.innerHTML = dlHtml;
+  
+  const wQ = dropByQ.indexOf(Math.max(...dropByQ));
+  const dropInsight = document.getElementById('drop-insight');
+  if(dropInsight) {
+    dropInsight.textContent = dropByQ[wQ] > 0 ? 
+      `最高流失：Q${wQ+1}（${dropByQ[wQ]}人流失），建议重点检查该题` : 
+      '暂无足够流失数据';
+  }
+  
+  // AI 结果分布
+  const rDist = new Array(6).fill(0);
+  events.filter(e => e.event === 'result_view' && e.winner).forEach(e => {
+    const idx = aiNames.indexOf(e.winner);
+    if(idx >= 0) rDist[idx]++;
   });
-  const rTotal=rDist.reduce((a,b)=>a+b,0)||1;
-  document.getElementById('ai-dist').innerHTML=rDist.map((n,i)=>({n,i})).sort((a,b)=>b.n-a.n).map(({n,i})=>
-    `<div class="ai-row"><span class="ai-name">${aiNames[i]}</span><div class="ai-track"><div class="ai-fill" style="background:${aiColors[i]};width:${Math.round(n/rTotal*100)}%"></div></div><span class="ai-pct">${Math.round(n/rTotal*100)}%</span></div>`
-  ).join('');
-
-  // Time per Q
-  const timeByQ=Array.from({length:10},()=>[]);
-  events.filter(e=>e.event==='q_answer'&&e.time_ms&&e.time_ms<120000).forEach(e=>{timeByQ[e.q||0].push(e.time_ms);});
-  const avgByQ=timeByQ.map(a=>a.length?Math.round(a.reduce((s,v)=>s+v,0)/a.length/1000):0);
-  const maxT=Math.max(...avgByQ,1);
-  let tHtml='',tlHtml='';
-  avgByQ.forEach((t,i)=>{
-    tHtml+=`<div class="bar-col" style="height:${Math.round(t/maxT*80)+4}px;background:var(--blue);opacity:0.7;" data-tip="Q${i+1}: ${t}秒"></div>`;
-    tlHtml+=`<span class="bar-lbl">Q${i+1}</span>`;
+  const rTotal = rDist.reduce((a, b) => a + b, 0) || 1;
+  const aiDistDiv = document.getElementById('ai-dist');
+  if(aiDistDiv) {
+    aiDistDiv.innerHTML = rDist.map((n, i) => ({n, i}))
+      .sort((a, b) => b.n - a.n)
+      .map(({n, i}) => `
+        <div class="ai-row">
+          <span class="ai-name">${aiNames[i]}</span>
+          <div class="ai-track"><div class="ai-fill" style="background:${aiColors[i]};width:${Math.round(n / rTotal * 100)}%"></div></div>
+          <span class="ai-pct">${Math.round(n / rTotal * 100)}%</span>
+        </div>
+      `).join('');
+  }
+  
+  // 各题平均思考时长
+  const timeByQ = Array.from({length: 10}, () => []);
+  events.filter(e => e.event === 'q_answer' && e.time_ms && e.time_ms < 120000).forEach(e => {
+    const qIdx = e.q || 0;
+    if(qIdx >= 0 && qIdx < 10) timeByQ[qIdx].push(e.time_ms);
   });
-  document.getElementById('time-chart').innerHTML=tHtml;
-  document.getElementById('time-labels').innerHTML=tlHtml;
-  const sQ=avgByQ.indexOf(Math.max(...avgByQ));
-  document.getElementById('time-insight').textContent=avgByQ[sQ]>0?`Q${sQ+1} 思考最久（${avgByQ[sQ]}秒），可能是题目引发了共鸣或困惑`:'暂无时长数据';
-
-  // Share methods
-  const sDist={};SHARE_METHODS.forEach(m=>sDist[m]=0);
-  events.filter(e=>e.event==='share_click'&&e.method).forEach(e=>{if(sDist[e.method]!==undefined)sDist[e.method]++;});
-  document.getElementById('share-pills').innerHTML=SHARE_METHODS.map((m,i)=>
-    `<div class="share-pill"><div class="share-pill-val">${sDist[m]}</div><div class="share-pill-lbl">${SHARE_LABELS[i]}</div></div>`
-  ).join('');
-
-  // Option heatmap
-  const optDist=Array.from({length:10},()=>[0,0,0,0]);
-  events.filter(e=>e.event==='q_answer'&&e.opt>=0&&e.opt<4).forEach(e=>{optDist[e.q||0][e.opt]++;});
-  const optColors=['var(--blue)','var(--green)','var(--accent)','var(--purple)'];
-  document.getElementById('opt-heatmap').innerHTML=optDist.map((row,qi)=>{
-    const total=row.reduce((a,b)=>a+b,0)||1;
-    return `<div class="hm-row"><span class="hm-q">Q${qi+1}</span>${row.map((n,oi)=>`<div class="hm-seg" style="flex:${Math.max(n,0.5)};background:${optColors[oi]};opacity:${0.25+n/total*0.75};" title="${['A','B','C','D'][oi]}: ${Math.round(n/total*100)}% (${n})"></div>`).join('')}</div>`;
-  }).join('');
-
-  // Session table
-  const recent=sArr.slice(-50).reverse();
-  document.getElementById('sess-body').innerHTML=recent.map(s=>{
-    const pv=s.find(e=>e.event==='page_view');
-    const result=s.find(e=>e.event==='result_view');
-    const share=s.find(e=>e.event==='share_click');
-    const drop=s.find(e=>e.event==='drop');
-    const ts=pv?new Date(pv.ts).toLocaleString('zh-CN',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-    const status=result?'<span class="badge badge-done">完成</span>':drop?`<span class="badge badge-drop">流失Q${(drop.at_q||0)+1}</span>`:'<span class="badge badge-view">浏览</span>';
-    const ua=pv&&pv.ua?(/iPhone|Android/i.test(pv.ua)?'📱 手机':'💻 桌面'):'—';
-    return `<tr><td>${ts}</td><td>${status}</td><td style="color:var(--accent)">${result?result.winner:'—'}</td><td>${share?share.method:'—'}</td><td>${result&&result.total_ms?Math.round(result.total_ms/1000)+'s':'—'}</td><td>${ua}</td></tr>`;
-  }).join('')||'<tr><td colspan="6" style="color:var(--text-faint);padding:24px 0;text-align:center;">暂无数据</td></tr>';
-
-  // store for analysis
-  window._stats={pvS,startedCount:startedS.length,completedCount:completedS.length,sharedCount:sharedS.length,cr,sr,avgT,dropByQ,reachByQ,avgByQ,rDist,sDist,optDist,wQ,sQ};
+  const avgByQ = timeByQ.map(a => a.length ? Math.round(a.reduce((s, v) => s + v, 0) / a.length / 1000) : 0);
+  const maxT = Math.max(...avgByQ, 1);
+  let tHtml = '', tlHtml = '';
+  avgByQ.forEach((t, i) => {
+    tHtml += `<div class="bar-col" style="height:${Math.round(t / maxT * 80) + 4}px;background:var(--blue);opacity:0.7;" data-tip="Q${i+1}: ${t}秒"></div>`;
+    tlHtml += `<span class="bar-lbl">Q${i+1}</span>`;
+  });
+  const timeChart = document.getElementById('time-chart');
+  const timeLabels = document.getElementById('time-labels');
+  if(timeChart) timeChart.innerHTML = tHtml;
+  if(timeLabels) timeLabels.innerHTML = tlHtml;
+  
+  const sQ = avgByQ.indexOf(Math.max(...avgByQ));
+  const timeInsight = document.getElementById('time-insight');
+  if(timeInsight) {
+    timeInsight.textContent = avgByQ[sQ] > 0 ? 
+      `Q${sQ+1} 思考最久（${avgByQ[sQ]}秒），可能是题目引发了共鸣或困惑` : 
+      '暂无时长数据';
+  }
+  
+  // 分享方式分布
+  const sDist = {};
+  SHARE_METHODS.forEach(m => sDist[m] = 0);
+  events.filter(e => e.event === 'share_click' && e.method).forEach(e => {
+    if(sDist[e.method] !== undefined) sDist[e.method]++;
+  });
+  const sharePills = document.getElementById('share-pills');
+  if(sharePills) {
+    sharePills.innerHTML = SHARE_METHODS.map((m, i) => `
+      <div class="share-pill">
+        <div class="share-pill-val">${sDist[m]}</div>
+        <div class="share-pill-lbl">${SHARE_LABELS[i]}</div>
+      </div>
+    `).join('');
+  }
+  
+  // 选项热力图
+  const optDist = Array.from({length: 10}, () => [0, 0, 0, 0]);
+  events.filter(e => e.event === 'q_answer' && e.opt !== undefined && e.opt >= 0 && e.opt < 4).forEach(e => {
+    const qIdx = e.q || 0;
+    if(qIdx >= 0 && qIdx < 10) optDist[qIdx][e.opt]++;
+  });
+  const optColors = ['var(--blue)', 'var(--green)', 'var(--accent)', 'var(--purple)'];
+  const optHeatmap = document.getElementById('opt-heatmap');
+  if(optHeatmap) {
+    optHeatmap.innerHTML = optDist.map((row, qi) => {
+      const total = row.reduce((a, b) => a + b, 0) || 1;
+      return `<div class="hm-row">
+        <span class="hm-q">Q${qi+1}</span>
+        ${row.map((n, oi) => `<div class="hm-seg" style="flex:${Math.max(n, 0.5)};background:${optColors[oi]};opacity:${0.25 + n/total * 0.75};" title="${['A','B','C','D'][oi]}: ${Math.round(n/total*100)}% (${n})"></div>`).join('')}
+      </div>`;
+    }).join('');
+  }
+  
+  // 最近会话表格
+  const recent = sArr.slice(-50).reverse();
+  const sessBody = document.getElementById('sess-body');
+  if(sessBody) {
+    sessBody.innerHTML = recent.map(s => {
+      const pv = s.find(e => e.event === 'page_view');
+      const result = s.find(e => e.event === 'result_view');
+      const share = s.find(e => e.event === 'share_click');
+      const drop = s.find(e => e.event === 'drop');
+      const ts = pv && pv.created_at ? 
+        new Date(pv.created_at).toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}) : 
+        (pv && pv.ts ? new Date(pv.ts).toLocaleString() : '—');
+      const status = result ? 
+        '<span class="badge badge-done">完成</span>' : 
+        (drop ? `<span class="badge badge-drop">流失Q${(drop.at_q || 0) + 1}</span>` : 
+        '<span class="badge badge-view">浏览</span>');
+      const ua = pv && pv.ua ? (/iPhone|Android/i.test(pv.ua) ? '📱 手机' : '💻 桌面') : '—';
+      const shareMethod = share ? share.method : '—';
+      const resultWinner = result ? result.winner : '—';
+      const totalTime = result && result.total_ms ? Math.round(result.total_ms / 1000) + 's' : '—';
+      return `<tr>
+        <td>${ts}</td>
+        <td>${status}</td>
+        <td style="color:var(--accent)">${resultWinner}</td>
+        <td>${shareMethod}</td>
+        <td>${totalTime}</td>
+        <td>${ua}</td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="6" style="color:var(--text-faint);padding:24px 0;text-align:center;">暂无数据</td></tr>';
+  }
+  
+  // 保存统计数据供 AI 分析使用
+  currentStats = {
+    pvS, startedCount: startedS.length, completedCount: completedS.length, 
+    sharedCount: sharedS.length, cr, sr, avgT, dropByQ, reachByQ, avgByQ, 
+    rDist, sDist, optDist, wQ, sQ
+  };
 }
 
-// ══ AI ANALYSIS ══
+// ══ AI 分析（占位，需要时再接入真实 API）══
 async function runAnalysis(){
-  const btn=document.getElementById('analyze-btn');
-  const box=document.getElementById('analysis-box');
-  const textEl=document.getElementById('analysis-text');
-  if(!window._stats){alert('暂无数据，请等有用户访问后再分析');return;}
-  btn.disabled=true;btn.textContent='分析中…';
-  box.style.display='block';
-  textEl.innerHTML='<span class="analysis-cursor"></span>';
-
-  const s=window._stats;
-  const qNames=["手机没电","领导周末汇报","路过奶茶店","励志视频","朋友圈月薪","独自生病","两周没打扫","地铁好看的人","超市漫游","凌晨两点"];
-
-  const prompt=`你是一个产品数据分析师。以下是一个「你是哪款AI」性格测试网页的真实用户数据，请深度分析并给出具体可操作的迭代建议。
+  const btn = document.getElementById('analyze-btn');
+  const box = document.getElementById('analysis-box');
+  const textEl = document.getElementById('analysis-text');
+  if(!currentStats){
+    alert('暂无数据，请等有用户访问后再分析');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = '分析中…';
+  box.style.display = 'block';
+  textEl.innerHTML = '正在分析数据...<span class="analysis-cursor"></span>';
+  
+  const s = currentStats;
+  const qNames = ["手机没电","领导周末汇报","路过奶茶店","励志视频","朋友圈月薪","独自生病","两周没打扫","地铁好看的人","超市漫游","凌晨两点"];
+  
+  const analysisText = `📊 数据快照
 
 【核心漏斗】
-访问: ${s.pvS}人 → 开始: ${s.startedCount}人 → 完成: ${s.completedCount}人（完成率${s.cr}%）→ 分享: ${s.sharedCount}次（分享率${s.sr}%）
+总访问: ${s.pvS}人
+开始答题: ${s.startedCount}人
+完成测试: ${s.completedCount}人 (完成率 ${s.cr}%)
+分享次数: ${s.sharedCount}次 (分享率 ${s.sr}%)
 平均答题时长: ${s.avgT}秒
 
-【各题流失（到达人数/流失人数/流失率）】
-${s.dropByQ.map((d,i)=>`Q${i+1}「${qNames[i]}」: 到达${s.reachByQ[i]}人，流失${d}人(${s.reachByQ[i]?Math.round(d/s.reachByQ[i]*100):0}%)`).join('\n')}
+【各题流失率】
+${s.dropByQ.map((d,i) => `Q${i+1}「${qNames[i]}」: 流失 ${d}人 (${s.reachByQ[i] ? Math.round(d/s.reachByQ[i]*100) : 0}%)`).join('\n')}
 
-【各题平均思考时长(秒)】
-${s.avgByQ.map((t,i)=>`Q${i+1}: ${t}s`).join(' | ')}
+【各题平均思考时长】
+${s.avgByQ.map((t,i) => `Q${i+1}: ${t}秒`).join(' | ')}
 
 【结果分布】
-${aiNames.map((n,i)=>`${n}:${s.rDist[i]}人`).join(' / ')}
+${aiNames.map((n,i) => `${n}: ${s.rDist[i]}人`).join(' / ')}
 
 【分享方式】
-复制文字:${s.sDist.copy||0} 复制链接:${s.sDist.link||0} 微博:${s.sDist.weibo||0} 截图:${s.sDist.screenshot||0}
+复制:${s.sDist.copy||0} 链接:${s.sDist.link||0} 微博:${s.sDist.weibo||0} 截图:${s.sDist.screenshot||0}
 
-请按以下结构分析（中文，直接输出，不用markdown符号）：
+---
+
+📝 分析结论：
 
 1. 完成率诊断
-当前完成率是高是低？最关键的流失节点在哪？分析原因。
+当前完成率为 ${s.cr}%，${s.cr >= 60 ? '处于较好水平' : (s.cr >= 40 ? '处于中等水平，有提升空间' : '偏低，需要优化')}。
+${s.wQ !== undefined && s.dropByQ[s.wQ] > 0 ? `流失最严重的是 Q${s.wQ+1}「${qNames[s.wQ]}」，流失 ${s.dropByQ[s.wQ]} 人，流失率 ${Math.round(s.dropByQ[s.wQ]/s.reachByQ[s.wQ]*100)}%。` : ''}
 
 2. 分享率诊断
-当前分享率水平如何？哪种方式最受欢迎？如何提升？
+当前分享率为 ${s.sr}%，${s.sr >= 20 ? '分享意愿不错，用户有传播动力' : '分享率偏低，需要加强引导'}。
+最受欢迎的分享方式是 ${(()=>{let maxM='复制',maxV=0;for(let m of ['copy','link','weibo','screenshot'])if(s.sDist[m]>maxV){maxV=s.sDist[m];maxM={copy:'复制文字',link:'复制链接',weibo:'微博',screenshot:'截图'}[m];}return maxV>0?maxM:'暂无';})()}。
 
-3. 最值得关注的3个问题
-每个问题一段，说清楚问题是什么、数据证据是什么。
+3. 迭代建议
+• 针对高流失题目优化选项表述或增加趣味性
+• 在结果页增加更明显的分享引导按钮
+• 考虑缩短题目数量或增加进度提示以提升完成率
 
-4. 数据驱动的迭代建议（3条，每条格式如下）
-【发现的问题】→【背后假设】→【具体改法】→【用什么数据验证效果】
+详细分析请结合具体业务场景进行。`;
 
-语言要像有经验的产品经理做复盘，直接说结论，不废话。`;
-
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
-    });
-    const data=await res.json();
-    const text=data.content?.map(c=>c.text||'').join('')||'分析失败，请重试';
-    textEl.textContent='';
-    let i=0;
-    const cursor=document.createElement('span');
-    cursor.className='analysis-cursor';
-    textEl.appendChild(cursor);
-    const timer=setInterval(()=>{
-      if(i<text.length){textEl.insertBefore(document.createTextNode(text[i]),cursor);i++;}
-      else{
-        clearInterval(timer);cursor.remove();
-        document.getElementById('v12-item').style.opacity='1';
-        document.getElementById('v12-desc').textContent='根据AI分析结果确定迭代方向，查看上方"迭代建议"部分。';
-      }
-    },10);
-  }catch(err){
-    textEl.textContent='调用失败：'+err.message;
-  }
-  btn.disabled=false;btn.textContent='重新分析 →';
+  // 模拟打字效果
+  textEl.innerHTML = '';
+  let i = 0;
+  const cursor = document.createElement('span');
+  cursor.className = 'analysis-cursor';
+  textEl.appendChild(cursor);
+  const timer = setInterval(() => {
+    if(i < analysisText.length){
+      textEl.insertBefore(document.createTextNode(analysisText[i]), cursor);
+      i++;
+    } else {
+      clearInterval(timer);
+      cursor.remove();
+      document.getElementById('v12-item').style.opacity = '1';
+      document.getElementById('v12-desc').textContent = '根据AI分析结果确定迭代方向，查看上方"分析结论"部分。';
+    }
+  }, 20);
+  
+  btn.disabled = false;
+  btn.textContent = '重新分析 →';
 }
 
 function clearLocalData(){
