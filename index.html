@@ -75,6 +75,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-we
 .score-fill{height:100%;border-radius:4px;width:0%;transition:width 1s ease;}
 .score-val{font-size:11px;color:var(--text-faint);min-width:24px;text-align:right;}
 
+/* AI 点评区域 */
+.ai-comment-card{background:linear-gradient(135deg, rgba(212,168,83,0.08) 0%, rgba(212,168,83,0.02) 100%);border:0.5px solid rgba(212,168,83,0.2);border-radius:16px;padding:24px;margin-bottom:20px;position:relative;}
+.ai-comment-label{display:inline-flex;align-items:center;gap:6px;background:rgba(212,168,83,0.12);padding:4px 12px;border-radius:20px;font-size:10px;letter-spacing:0.1em;color:var(--accent);margin-bottom:16px;}
+.ai-comment-label::before{content:'✨';font-size:12px;}
+.ai-comment-text{font-size:15px;line-height:1.8;color:var(--text);font-style:italic;}
+.ai-comment-loading{display:flex;align-items:center;gap:12px;color:var(--text-muted);font-size:14px;}
+.ai-comment-loading::after{content:'';width:16px;height:16px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ai-comment-retry{background:none;border:0.5px solid var(--border);color:var(--text-muted);font-size:11px;padding:4px 12px;border-radius:16px;margin-top:12px;cursor:pointer;}
+.ai-comment-retry:hover{border-color:var(--accent);color:var(--accent);}
+
 /* SHARE */
 .share-section{background:var(--surface);border:0.5px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;}
 .share-title{font-size:13px;color:var(--text-muted);margin-bottom:16px;text-align:center;}
@@ -129,6 +140,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-we
       <div class="result-ai-name" id="r-name"></div>
       <div class="result-subtitle" id="r-sub"></div>
     </div>
+    
+    <!-- AI 智能点评区域 -->
+    <div class="ai-comment-card" id="ai-comment-card">
+      <div class="ai-comment-label">AI 灵魂点评</div>
+      <div id="ai-comment-content">
+        <div class="ai-comment-loading">AI 正在为你生成专属点评...</div>
+      </div>
+    </div>
+    
     <div class="result-card">
       <div class="result-card-label">人格画像</div>
       <div class="result-desc" id="r-desc"></div>
@@ -165,8 +185,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-we
 <div class="toast" id="toast"></div>
 
 <script>
+// ==================== Supabase 配置 ====================
 var SB_URL = 'https://kzinhbfeilyshsfpfbsm.supabase.co';
 var SB_KEY = 'sb_publishable_Iaax24ehcPXHi_3UHK7kFg_Ye32eIKj';
+
+// ==================== OpenRouter AI 配置 ====================
+var OPENROUTER_API_KEY = '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';
+
+// ==================== 会话追踪 ====================
 var SID = (function(){
   var k='aiq_sid', s=sessionStorage.getItem(k);
   if(!s){s=Date.now().toString(36)+Math.random().toString(36).slice(2);sessionStorage.setItem(k,s);}
@@ -194,6 +220,7 @@ function track(evt, data) {
 
 track('page_view', {referrer: document.referrer||'direct'});
 
+// ==================== 题目数据 ====================
 var QS = [
   {q:"手机没电了，充电宝也没电，你最真实的反应是？",o:[
     "太好了，我终于有借口不回消息了。",
@@ -265,6 +292,94 @@ var qStartTs = 0;
 var quizStartTs = 0;
 var winnerResult = null;
 
+// ==================== AI 点评函数 ====================
+async function fetchAIComment(winnerName, answersArray, winnerSub) {
+  // 将选项索引转换为字母（A/B/C/D）
+  var answerLetters = answersArray.map(function(opt) {
+    return String.fromCharCode(65 + opt);
+  }).join('');
+  
+  // 构建 prompt
+  var prompt = '用户完成了一个AI人格测试，结果如下：\n' +
+    '- 人格类型：' + winnerName + '\n' +
+    '- 人格描述：' + winnerSub + '\n' +
+    '- 用户的10个选项：' + answerLetters + '\n\n' +
+    '请用一句幽默、走心、不套路的短评（20-40字），点评这个用户的人格特点。直接输出点评内容，不要加任何前缀或解释。';
+  
+  try {
+    var response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + OPENROUTER_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'qwen/qwen-2.5-7b-instruct',
+        messages: [
+          {
+            role: 'system',
+            content: '你是一个幽默、有洞察力的AI人格解读助手。你的点评要让人会心一笑，感觉被戳中。'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_tokens: 100,
+        temperature: 0.8
+      })
+    });
+    
+    if (!response.ok) {
+      var errorText = await response.text();
+      console.error('API 错误:', response.status, errorText);
+      throw new Error('API 返回 ' + response.status);
+    }
+    
+    var data = await response.json();
+    var comment = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    
+    if (comment) {
+      // 清理可能的引号包裹
+      comment = comment.replace(/^["']|["']$/g, '').trim();
+      return comment;
+    } else {
+      throw new Error('无效的响应格式');
+    }
+  } catch (error) {
+    console.error('AI 调用失败:', error);
+    return null;
+  }
+}
+
+function displayAIComment(comment) {
+  var container = document.getElementById('ai-comment-content');
+  if (comment) {
+    container.innerHTML = '<div class="ai-comment-text">💬 ' + comment + '</div>' +
+      '<button class="ai-comment-retry" onclick="retryAIComment()">🔄 换一句</button>';
+    // 上报成功
+    track('ai_comment_success', { winner: winnerResult ? winnerResult.name : 'unknown' });
+  } else {
+    container.innerHTML = '<div class="ai-comment-text" style="color:var(--text-muted);">✨ AI 点评暂时无法生成，你可以刷新页面重试~</div>' +
+      '<button class="ai-comment-retry" onclick="retryAIComment()">🔄 重试</button>';
+    track('ai_comment_failed', { winner: winnerResult ? winnerResult.name : 'unknown' });
+  }
+}
+
+function retryAIComment() {
+  if (!winnerResult) return;
+  var container = document.getElementById('ai-comment-content');
+  container.innerHTML = '<div class="ai-comment-loading">AI 正在重新生成...</div>';
+  track('ai_comment_retry', { winner: winnerResult.name });
+  
+  fetchAIComment(winnerResult.name, answers, winnerResult.sub).then(function(comment) {
+    displayAIComment(comment);
+  }).catch(function() {
+    displayAIComment(null);
+  });
+}
+
+// ==================== 页面渲染函数 ====================
 function show(id) {
   document.getElementById('pg-hero').style.display = 'none';
   document.getElementById('pg-quiz').style.display = 'none';
@@ -351,6 +466,7 @@ function showResult() {
   var totalMs = Date.now() - quizStartTs;
   track('result_view', { winner: AI_NAMES[winner], scores: scores.join(','), total_ms: totalMs });
 
+  // 渲染基础结果
   document.getElementById('r-name').textContent = winnerResult.name;
   document.getElementById('r-name').style.color = winnerResult.color;
   document.getElementById('r-sub').textContent = winnerResult.sub;
@@ -375,7 +491,16 @@ function showResult() {
     })('sf'+ii, w);
   }
   document.getElementById('r-bars').innerHTML = barsHtml;
+  
+  // 显示结果页面
   show('pg-result');
+  
+  // 异步调用 AI 点评
+  fetchAIComment(winnerResult.name, answers, winnerResult.sub).then(function(comment) {
+    displayAIComment(comment);
+  }).catch(function() {
+    displayAIComment(null);
+  });
 }
 
 function showToast(msg) {
@@ -385,7 +510,7 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 2500);
 }
 
-// BIND EVENTS
+// ==================== 事件绑定 ====================
 document.getElementById('btn-start').addEventListener('click', function() {
   answers = [];
   quizStartTs = Date.now();
@@ -427,6 +552,9 @@ document.getElementById('btn-retry').addEventListener('click', function() {
   show('pg-quiz');
   renderQ(0);
 });
+
+// 将 retryAIComment 挂载到 window 以便 onclick 调用
+window.retryAIComment = retryAIComment;
 </script>
 </body>
 </html>
