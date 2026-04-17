@@ -16,82 +16,66 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--text);font-family:'Noto Sans SC',sans-serif;font-weight:300;min-height:100vh;}
 
-  /* LOGIN */
   #login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;}
   .login-box{width:340px;text-align:center;}
-  .login-logo{font-family:'Noto Sans SC',sans-serif;font-size:11px;letter-spacing:0.2em;color:var(--text-faint);text-transform:uppercase;margin-bottom:32px;}
+  .login-logo{font-size:11px;letter-spacing:0.2em;color:var(--text-faint);margin-bottom:32px;}
   .login-box h2{font-size:16px;font-weight:400;color:var(--text-muted);margin-bottom:24px;}
-  .login-box input{width:100%;background:var(--surface);border:0.5px solid var(--border);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:14px;padding:12px 16px;border-radius:8px;text-align:center;letter-spacing:0.15em;outline:none;margin-bottom:10px;transition:border-color 0.2s;}
-  .login-box input:focus{border-color:var(--border-hover);}
-  .login-box button{width:100%;background:var(--accent);color:#0a0a0b;font-family:'Noto Sans SC',sans-serif;font-size:13px;font-weight:500;padding:12px;border-radius:8px;border:none;cursor:pointer;}
-  .login-err{font-size:12px;color:var(--red);margin-top:8px;min-height:18px;}
-  .login-sb-note{font-size:11px;color:var(--text-faint);margin-top:16px;line-height:1.7;}
-  .login-sb-note a{color:var(--text-faint);text-decoration:underline;}
+  .login-box input{width:100%;background:var(--surface);border:0.5px solid var(--border);color:var(--text);font-family:monospace;font-size:14px;padding:12px 16px;border-radius:8px;text-align:center;outline:none;margin-bottom:10px;}
+  .login-box button{width:100%;background:var(--accent);color:#0a0a0b;font-size:13px;font-weight:500;padding:12px;border-radius:8px;border:none;cursor:pointer;}
+  .login-err{font-size:12px;color:var(--red);margin-top:8px;}
 
-  /* ADMIN */
   #admin-screen{display:none;}
-  .admin-header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:0.5px solid var(--border);}
+  .admin-header{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:0.5px solid var(--border);flex-wrap:wrap;gap:12px;}
   .admin-header h1{font-size:13px;font-weight:400;letter-spacing:0.08em;color:var(--text-muted);}
-  .header-right{display:flex;align-items:center;gap:14px;}
+  .header-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
   .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-  .last-upd{font-size:11px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;}
-  .hdr-btn{font-size:11px;color:var(--text-muted);background:none;border:0.5px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+  .last-upd{font-size:11px;color:var(--text-faint);font-family:monospace;}
+  .hdr-btn{font-size:11px;color:var(--text-muted);background:none;border:0.5px solid var(--border);padding:5px 12px;border-radius:20px;cursor:pointer;text-decoration:none;display:inline-block;}
   .hdr-btn:hover{border-color:var(--border-hover);color:var(--text);}
   .data-src{font-size:10px;padding:3px 10px;border-radius:20px;border:0.5px solid;}
   .src-sb{color:var(--green);border-color:var(--green);}
-  .src-local{color:var(--text-faint);border-color:var(--text-faint);}
 
-  /* KPIs */
   .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);}
   .kpi{background:var(--surface);padding:20px 24px;}
-  .kpi-val{font-family:'JetBrains Mono',monospace;font-size:32px;font-weight:500;line-height:1;margin-bottom:6px;}
+  .kpi-val{font-family:monospace;font-size:32px;font-weight:500;line-height:1;margin-bottom:6px;}
   .kpi-label{font-size:11px;color:var(--text-muted);}
-  .kpi-sub{font-size:10px;color:var(--text-faint);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+  .kpi-sub{font-size:10px;color:var(--text-faint);margin-top:4px;}
   .green{color:var(--green);} .red{color:var(--red);} .blue{color:var(--blue);} .accent{color:var(--accent);}
 
-  /* PANELS */
   .admin-body{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);}
   .panel{background:var(--bg);padding:24px 28px;}
   .panel.full{grid-column:1/-1;}
   .panel.half{grid-column:span 1;}
   .panel-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-faint);margin-bottom:20px;}
 
-  /* FUNNEL */
   .funnel-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
   .f-label{font-size:12px;color:var(--text-muted);min-width:84px;}
   .f-track{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
-  .f-fill{height:100%;border-radius:4px;transition:width 1s ease;}
-  .f-val{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);min-width:80px;text-align:right;}
+  .f-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+  .f-val{font-size:11px;font-family:monospace;color:var(--text-muted);min-width:80px;text-align:right;}
 
-  /* BARS */
   .bar-chart{display:flex;align-items:flex-end;gap:4px;height:90px;}
-  .bar-col{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:height 1s ease;position:relative;cursor:default;}
-  .bar-col:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100%+6px);left:50%;transform:translateX(-50%);background:var(--surface2);border:0.5px solid var(--border-hover);color:var(--text);font-size:10px;padding:4px 8px;border-radius:4px;white-space:nowrap;pointer-events:none;font-family:'JetBrains Mono',monospace;z-index:10;}
+  .bar-col{flex:1;border-radius:3px 3px 0 0;min-height:2px;transition:height 0.5s ease;position:relative;cursor:default;}
+  .bar-col:hover::after{content:attr(data-tip);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:var(--surface2);border:0.5px solid var(--border);color:var(--text);font-size:10px;padding:4px 8px;border-radius:4px;white-space:nowrap;}
   .bar-labels{display:flex;gap:4px;margin-top:5px;}
   .bar-lbl{flex:1;text-align:center;font-size:9px;color:var(--text-faint);}
-  .bar-insight{font-size:11px;color:var(--text-faint);margin-top:10px;line-height:1.6;}
 
-  /* AI DIST */
   .ai-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
   .ai-name{font-size:12px;color:var(--text-muted);min-width:72px;}
   .ai-track{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
-  .ai-fill{height:100%;border-radius:3px;transition:width 1s ease;}
-  .ai-pct{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-faint);min-width:36px;text-align:right;}
+  .ai-fill{height:100%;border-radius:3px;transition:width 0.5s ease;}
 
-  /* SHARE PILLS */
   .share-pills{display:flex;gap:10px;flex-wrap:wrap;}
   .share-pill{background:var(--surface2);border:0.5px solid var(--border);border-radius:12px;padding:12px 16px;text-align:center;min-width:80px;}
-  .share-pill-val{font-size:22px;font-weight:500;font-family:'JetBrains Mono',monospace;color:var(--accent);}
+  .share-pill-val{font-size:22px;font-weight:500;font-family:monospace;color:var(--accent);}
   .share-pill-lbl{font-size:10px;color:var(--text-faint);margin-top:3px;}
 
-  /* OPT HEATMAP */
   .hm-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
   .hm-q{font-size:10px;color:var(--text-faint);min-width:24px;}
-  .hm-seg{height:14px;border-radius:2px;transition:flex 0.8s ease;}
+  .hm-seg{height:14px;border-radius:2px;transition:flex 0.5s ease;}
 
-  /* SESSION TABLE */
-  .sess-table{width:100%;border-collapse:collapse;font-size:12px;font-family:'JetBrains Mono',monospace;}
+  .sess-table{width:100%;border-collapse:collapse;font-size:12px;font-family:monospace;}
   .sess-table th{text-align:left;font-size:10px;letter-spacing:0.1em;color:var(--text-faint);padding:0 0 10px;font-weight:400;}
   .sess-table td{padding:6px 0;border-top:0.5px solid var(--border);color:var(--text-muted);vertical-align:middle;}
   .badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:10px;border:0.5px solid;}
@@ -99,35 +83,25 @@
   .badge-drop{color:var(--red);border-color:var(--red);}
   .badge-view{color:var(--text-faint);border-color:var(--text-faint);}
 
-  /* AI ANALYSIS */
-  .analyze-btn{background:none;border:0.5px solid var(--accent);color:var(--accent);font-family:'Noto Sans SC',sans-serif;font-size:12px;padding:8px 20px;border-radius:20px;cursor:pointer;transition:all 0.2s;}
-  .analyze-btn:hover{background:rgba(212,168,83,0.08);}
-  .analyze-btn:disabled{opacity:0.3;cursor:not-allowed;}
+  .analyze-btn{background:none;border:0.5px solid var(--accent);color:var(--accent);font-size:12px;padding:8px 20px;border-radius:20px;cursor:pointer;}
+  .analyze-btn:disabled{opacity:0.3;}
   .analysis-box{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:24px;margin-top:16px;display:none;}
   .analysis-text{font-size:14px;line-height:1.9;color:var(--text-muted);white-space:pre-wrap;}
-  .analysis-cursor{display:inline-block;width:2px;height:14px;background:var(--accent);margin-left:2px;animation:blink 0.8s infinite;vertical-align:text-bottom;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
 
-  /* ITER LOG */
   .iter-item{display:flex;gap:16px;padding:16px 0;border-bottom:0.5px solid var(--border);}
-  .iter-item:last-child{border-bottom:none;}
   .iter-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
   .iter-title{font-size:13px;color:var(--text);margin-bottom:4px;}
   .iter-desc{font-size:12px;color:var(--text-muted);line-height:1.6;}
-  .iter-meta{font-size:10px;color:var(--text-faint);margin-top:4px;font-family:'JetBrains Mono',monospace;}
+  .iter-meta{font-size:10px;color:var(--text-faint);margin-top:4px;}
 
-  .danger-btn{background:none;border:0.5px solid rgba(224,90,90,0.3);color:var(--red);font-size:11px;padding:6px 16px;border-radius:20px;cursor:pointer;opacity:0.6;transition:opacity 0.2s;}
-  .danger-btn:hover{opacity:1;border-color:var(--red);}
+  .empty-state{text-align:center;padding:40px 0;color:var(--text-faint);}
 
-  .empty-state{text-align:center;padding:40px 0;color:var(--text-faint);font-size:13px;line-height:1.8;}
-
-  @media(max-width:900px){.admin-body{grid-template-columns:1fr 1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}.panel.half{grid-column:span 1;}}
-  @media(max-width:600px){.admin-body{grid-template-columns:1fr;}.panel.half,.panel.full{grid-column:span 1;}.kpi-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:900px){.admin-body{grid-template-columns:1fr 1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}}
+  @media(max-width:600px){.admin-body{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:1fr 1fr;}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">AI人格测试 · 数据后台</div>
@@ -135,18 +109,16 @@
     <input type="password" id="pwd-input" placeholder="••••••••" onkeydown="if(event.key==='Enter')checkPwd()" />
     <button onclick="checkPwd()">进入后台</button>
     <div class="login-err" id="pwd-err"></div>
-    <div class="login-sb-note">数据来源：Supabase 云数据库<br>如需修改配置，<a href="index.html">返回测试页</a>重新配置</div>
   </div>
 </div>
 
-<!-- ADMIN -->
 <div id="admin-screen">
   <div class="admin-header">
     <h1>AI人格测试 · 数据看板</h1>
     <div class="header-right">
       <div class="live-dot"></div>
       <span class="last-upd" id="last-upd">—</span>
-      <span class="data-src" id="data-src-badge">—</span>
+      <span class="data-src src-sb" id="data-src-badge">Supabase</span>
       <button class="hdr-btn" onclick="loadData()">刷新</button>
       <a href="index.html" class="hdr-btn">← 测试页</a>
     </div>
@@ -160,522 +132,304 @@
   </div>
 
   <div class="admin-body">
-
     <div class="panel half">
       <div class="panel-label">转化漏斗</div>
-      <div id="funnel-wrap">
-        <div class="funnel-row"><span class="f-label">落地访问</span><div class="f-track"><div class="f-fill" style="background:var(--blue);width:0%" id="f0"></div></div><span class="f-val" id="fv0">—</span></div>
-        <div class="funnel-row"><span class="f-label">开始答题</span><div class="f-track"><div class="f-fill" style="background:var(--blue);width:0%;opacity:0.75" id="f1"></div></div><span class="f-val" id="fv1">—</span></div>
-        <div class="funnel-row"><span class="f-label">答到第5题</span><div class="f-track"><div class="f-fill" style="background:var(--accent);width:0%;opacity:0.8" id="f2"></div></div><span class="f-val" id="fv2">—</span></div>
-        <div class="funnel-row"><span class="f-label">看到结果</span><div class="f-track"><div class="f-fill" style="background:var(--green);width:0%" id="f3"></div></div><span class="f-val" id="fv3">—</span></div>
-        <div class="funnel-row"><span class="f-label">点击分享</span><div class="f-track"><div class="f-fill" style="background:var(--accent);width:0%" id="f4"></div></div><span class="f-val" id="fv4">—</span></div>
-      </div>
+      <div id="funnel-wrap"></div>
     </div>
-
     <div class="panel half">
-      <div class="panel-label">各题流失分布（颜色越红=流失越严重）</div>
+      <div class="panel-label">各题流失分布</div>
       <div class="bar-chart" id="drop-chart"></div>
       <div class="bar-labels" id="drop-labels"></div>
-      <div class="bar-insight" id="drop-insight">—</div>
+      <div class="bar-insight" id="drop-insight" style="font-size:11px;color:var(--text-faint);margin-top:10px;"></div>
     </div>
-
     <div class="panel half">
       <div class="panel-label">结果分布</div>
       <div id="ai-dist"></div>
     </div>
-
     <div class="panel half">
-      <div class="panel-label">各题平均思考时长（秒）</div>
+      <div class="panel-label">各题平均思考时长</div>
       <div class="bar-chart" id="time-chart"></div>
       <div class="bar-labels" id="time-labels"></div>
-      <div class="bar-insight" id="time-insight">—</div>
+      <div class="bar-insight" id="time-insight" style="font-size:11px;color:var(--text-faint);margin-top:10px;"></div>
     </div>
-
     <div class="panel half">
       <div class="panel-label">分享方式分布</div>
       <div class="share-pills" id="share-pills"></div>
     </div>
-
     <div class="panel half">
-      <div class="panel-label">选项热力（各题 A/B/C/D 占比）</div>
+      <div class="panel-label">选项热力</div>
       <div id="opt-heatmap"></div>
     </div>
-
     <div class="panel full">
-      <div class="panel-label">最近会话记录（最新50条）</div>
+      <div class="panel-label">最近会话记录</div>
       <div id="sess-wrap">
         <table class="sess-table">
-          <thead><tr><th>时间</th><th>状态</th><th>结果</th><th>分享</th><th>耗时</th><th>设备</th></thead>
+          <thead><tr><th>时间</th><th>状态</th><th>结果</th><th>分享</th><th>耗时</th></tr></thead>
           <tbody id="sess-body"></tbody>
         </table>
       </div>
     </div>
-
     <div class="panel full">
       <div class="panel-label">AI 智能诊断 · 数据驱动迭代建议</div>
-      <div style="font-size:12px;color:var(--text-faint);line-height:1.7;margin-bottom:12px;">
-        把上面所有数据喂给 Claude，自动分析完成率低的原因、分享率提升空间、以及具体迭代方向。
-      </div>
-      <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">用 AI 分析数据，生成迭代建议 →</button>
+      <button class="analyze-btn" id="analyze-btn" onclick="runAnalysis()">📊 用 AI 分析数据，生成迭代建议</button>
       <div class="analysis-box" id="analysis-box">
         <div class="analysis-text" id="analysis-text"></div>
       </div>
     </div>
-
-    <div class="panel full">
-      <div class="panel-label">迭代记录</div>
-      <div>
-        <div class="iter-item">
-          <div class="iter-dot" style="background:var(--green)"></div>
-          <div>
-            <div class="iter-title">v1.0 · 上线初版</div>
-            <div class="iter-desc">10题测试 + 6种AI人格结果 + 分享功能</div>
-            <div class="iter-meta">events: quiz_start / q_answer / result_view / share_click</div>
-          </div>
-        </div>
-        <div class="iter-item">
-          <div class="iter-dot" style="background:var(--accent)"></div>
-          <div>
-            <div class="iter-title">v1.1 · Supabase 版本上线</div>
-            <div class="iter-desc">全用户数据实时同步云端，后台可跨设备查看，AI智能分析接入</div>
-            <div class="iter-meta">新增: supabase sync / admin dashboard / claude analysis</div>
-          </div>
-        </div>
-        <div class="iter-item" id="v12-item" style="opacity:0.3">
-          <div class="iter-dot" style="background:var(--text-faint)"></div>
-          <div>
-            <div class="iter-title">v1.2 · 待定（看数据说话）</div>
-            <div class="iter-desc" id="v12-desc">点击"AI分析"按钮，根据真实用户数据确定下一步迭代方向。</div>
-            <div class="iter-meta">—</div>
-          </div>
-        </div>
-      </div>
-      <div style="margin-top:24px;padding-top:16px;border-top:0.5px solid var(--border);">
-        <div style="font-size:10px;color:var(--text-faint);margin-bottom:8px;letter-spacing:0.1em;">DANGER ZONE</div>
-        <button class="danger-btn" onclick="clearLocalData()">清空本机缓存数据</button>
-        <span style="font-size:10px;color:var(--text-faint);margin-left:10px;">Supabase 数据不受影响，请在 Supabase 控制台管理</span>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <script>
-// ══ SUPABASE 配置（与 index.html 保持一致）══
+// Supabase 配置
 const SB_URL = 'https://kzinhbfeilyshsfpfbsm.supabase.co';
 const SB_KEY = 'sb_publishable_Iaax24ehcPXHi_3UHK7kFg_Ye32eIKj';
-
-// 常量
 const ADMIN_PWD = 'aiq2024';
-const LOCAL_KEY = 'aiq_ev';  // 与 index.html 中的 localStorage key 一致
-const aiNames = ["ChatGPT","Claude","Kimi","DeepSeek","豆包","千问"];
-const aiColors = ["#10a37f","#c87c4a","#4a8bc8","#4ac8c8","#e05a7a","#7ab848"];
-const SHARE_METHODS = ['copy','link','weibo','screenshot'];
-const SHARE_LABELS = ['复制文字','复制链接','微博','截图'];
 
-// 用于存储全局统计
-let currentStats = null;
+const AI_NAMES = ["ChatGPT", "Claude", "Kimi", "DeepSeek", "豆包", "千问"];
+const AI_COLORS = ["#10a37f", "#c87c4a", "#4a8bc8", "#4ac8c8", "#e05a7a", "#7ab848"];
 
-// 登录验证
-function checkPwd(){
-  const v=document.getElementById('pwd-input').value;
-  if(v===ADMIN_PWD){
-    document.getElementById('login-screen').style.display='none';
-    document.getElementById('admin-screen').style.display='block';
+let rawEvents = [];
+
+function checkPwd() {
+  const v = document.getElementById('pwd-input').value;
+  if (v === ADMIN_PWD) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'block';
     loadData();
     setInterval(loadData, 30000);
   } else {
-    document.getElementById('pwd-err').textContent='密码错误';
+    document.getElementById('pwd-err').textContent = '密码错误';
   }
 }
 
-// URL 参数自动登录
-if(new URLSearchParams(location.search).get('admin')===ADMIN_PWD){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('admin-screen').style.display='block';
-  setTimeout(()=>{loadData();setInterval(loadData,30000);},100);
+// URL 自动登录
+if (new URLSearchParams(location.search).get('admin') === ADMIN_PWD) {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  setTimeout(() => { loadData(); setInterval(loadData, 30000); }, 100);
 }
 
-// ══ 从 Supabase 加载数据 ══
-async function loadData(){
-  document.getElementById('last-upd').textContent=new Date().toLocaleTimeString('zh-CN');
-  const badge=document.getElementById('data-src-badge');
-  
-  let events = [];
-  let fromSB = false;
+async function loadData() {
+  document.getElementById('last-upd').textContent = new Date().toLocaleTimeString('zh-CN');
   
   try {
-    // 从 Supabase 读取 events 表数据
-    const res = await fetch(
-      `${SB_URL}/rest/v1/events?select=*&order=created_at.desc&limit=5000`,
-      {
-        headers: {
-          'apikey': SB_KEY,
-          'Authorization': `Bearer ${SB_KEY}`
-        }
+    const res = await fetch(`${SB_URL}/rest/v1/events?select=*&order=created_at.desc&limit=2000`, {
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`
       }
-    );
+    });
     
     if (res.ok) {
       const rows = await res.json();
-      // 转换数据格式，将 data 字段中的内容展开
-      events = rows.map(row => ({
-        event: row.event,
-        session: row.session,
-        ts: row.ts,
-        created_at: row.created_at,
-        // 将 data JSON 中的字段展开到顶层
-        ...(row.data || {}),
-        // 保留原始 data 对象
-        _raw_data: row.data
-      }));
-      fromSB = true;
+      rawEvents = rows;
+      console.log('加载成功，共', rawEvents.length, '条记录');
+      renderDashboard();
     } else {
-      console.error('Supabase 查询失败:', res.status);
+      console.error('查询失败:', res.status);
+      showEmpty();
     }
-  } catch(e) {
-    console.error('Supabase 连接失败:', e);
+  } catch (err) {
+    console.error('连接失败:', err);
+    showEmpty();
   }
-  
-  // 如果 Supabase 没数据，尝试从 localStorage 读取（兼容旧数据）
-  if (!fromSB || events.length === 0) {
-    try {
-      const localEvents = JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]');
-      if (localEvents.length > 0) {
-        events = localEvents;
-        fromSB = false;
-      }
-    } catch(e) {}
-  }
-  
-  if (fromSB && events.length > 0) {
-    badge.textContent = 'Supabase 实时';
-    badge.className = 'data-src src-sb';
-  } else if (events.length > 0) {
-    badge.textContent = '本机缓存';
-    badge.className = 'data-src src-local';
-  } else {
-    badge.textContent = '暂无数据';
-    badge.className = 'data-src';
-  }
-  
-  if (!events.length) {
-    renderEmpty();
-    return;
-  }
-  
-  processAndRender(events);
 }
 
-function renderEmpty(){
-  ['kv-pv','kv-cr','kv-sr','kv-at'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.textContent = '0';
-  });
-  const sessBody = document.getElementById('sess-body');
-  if(sessBody) sessBody.innerHTML='<tr><td colspan="6" style="color:var(--text-faint);padding:24px 0;text-align:center;">暂无数据 · 先让几个朋友来测试</td></tr>';
-  const aiDist = document.getElementById('ai-dist');
-  if(aiDist) aiDist.innerHTML = '<div class="empty-state">暂无数据</div>';
-  const sharePills = document.getElementById('share-pills');
-  if(sharePills) sharePills.innerHTML = '<div class="empty-state">暂无分享数据</div>';
-  const optHeatmap = document.getElementById('opt-heatmap');
-  if(optHeatmap) optHeatmap.innerHTML = '<div class="empty-state">暂无答题数据</div>';
+function showEmpty() {
+  document.getElementById('kv-pv').textContent = '0';
+  document.getElementById('sess-body').innerHTML = '<tr><td colspan="5" style="padding:40px;text-align:center;">暂无数据</td></tr>';
 }
 
-// ══ 核心数据处理和渲染 ══
-function processAndRender(events){
+function renderDashboard() {
+  const events = rawEvents;
+  if (!events.length) { showEmpty(); return; }
+  
   // 按 session 分组
-  const sessMap = {};
+  const sessions = {};
   events.forEach(ev => {
-    if(!ev.session) return;
-    if(!sessMap[ev.session]) sessMap[ev.session] = [];
-    sessMap[ev.session].push(ev);
+    if (!ev.session) return;
+    if (!sessions[ev.session]) sessions[ev.session] = [];
+    sessions[ev.session].push(ev);
   });
-  const sArr = Object.values(sessMap);
+  const sessionList = Object.values(sessions);
   
-  // 各阶段统计
-  const pvS = sArr.length;  // 总访问会话数
-  const startedS = sArr.filter(s => s.some(e => e.event === 'quiz_start'));
-  const completedS = sArr.filter(s => s.some(e => e.event === 'result_view'));
-  const sharedS = sArr.filter(s => s.some(e => e.event === 'share_click'));
-  // 答到第5题（q_index >= 4，因为 q 从0开始）
-  const mid5S = sArr.filter(s => s.filter(e => e.event === 'q_answer').some(e => (e.q || 0) >= 4));
+  // 统计数据
+  const totalVisits = sessionList.length;
+  const started = sessionList.filter(s => s.some(e => e.event === 'quiz_start')).length;
+  const completed = sessionList.filter(s => s.some(e => e.event === 'result_view')).length;
+  const shared = sessionList.filter(s => s.some(e => e.event === 'share_click')).length;
   
-  // KPI 更新
-  document.getElementById('kv-pv').textContent = pvS;
-  document.getElementById('kv-pv-sub').textContent = startedS.length + ' 人开始答题';
+  document.getElementById('kv-pv').textContent = totalVisits;
+  document.getElementById('kv-pv-sub').textContent = started + ' 人开始';
   
-  const cr = startedS.length ? Math.round(completedS.length / startedS.length * 100) : 0;
-  const sr = completedS.length ? Math.round(sharedS.length / completedS.length * 100) : 0;
-  
-  const el_cr = document.getElementById('kv-cr');
-  el_cr.textContent = cr + '%';
-  el_cr.className = 'kpi-val ' + (cr >= 60 ? 'green' : (cr >= 30 ? 'accent' : 'red'));
-  document.getElementById('kv-cr-sub').textContent = completedS.length + ' / ' + startedS.length;
+  const cr = started ? Math.round(completed / started * 100) : 0;
+  const sr = completed ? Math.round(shared / completed * 100) : 0;
+  document.getElementById('kv-cr').textContent = cr + '%';
+  document.getElementById('kv-cr-sub').textContent = completed + ' / ' + started;
   document.getElementById('kv-sr').textContent = sr + '%';
-  document.getElementById('kv-sr-sub').textContent = sharedS.length + ' 次分享';
+  document.getElementById('kv-sr-sub').textContent = shared + ' 次分享';
   
-  // 平均答题时长（从 result_view 的 total_ms 获取）
-  const tEvents = events.filter(e => e.event === 'result_view' && e.total_ms);
-  const avgT = tEvents.length ? Math.round(tEvents.reduce((a, e) => a + e.total_ms, 0) / tEvents.length / 1000) : 0;
-  document.getElementById('kv-at').textContent = avgT || '—';
+  // 平均时长
+  const resultEvents = events.filter(e => e.event === 'result_view' && e.data && e.data.total_ms);
+  const avgTime = resultEvents.length ? Math.round(resultEvents.reduce((a, e) => a + (e.data.total_ms || 0), 0) / resultEvents.length / 1000) : 0;
+  document.getElementById('kv-at').textContent = avgTime || '—';
   
   // 漏斗
-  const base = pvS || 1;
-  const funnelData = [
-    [pvS, 'f0', 'fv0'],
-    [startedS.length, 'f1', 'fv1'],
-    [mid5S.length, 'f2', 'fv2'],
-    [completedS.length, 'f3', 'fv3'],
-    [sharedS.length, 'f4', 'fv4']
-  ];
-  funnelData.forEach(([n, fId, vId]) => {
-    const fillEl = document.getElementById(fId);
-    const valEl = document.getElementById(vId);
-    if(fillEl) fillEl.style.width = Math.round(n / base * 100) + '%';
-    if(valEl) valEl.textContent = n + '人 (' + Math.round(n / base * 100) + '%)';
-  });
+  const funnelHtml = `
+    <div class="funnel-row"><span class="f-label">落地访问</span><div class="f-track"><div class="f-fill" style="background:var(--blue);width:100%"></div></div><span class="f-val">${totalVisits}人</span></div>
+    <div class="funnel-row"><span class="f-label">开始答题</span><div class="f-track"><div class="f-fill" style="background:var(--blue);width:${started/totalVisits*100}%"></div></div><span class="f-val">${started}人 (${Math.round(started/totalVisits*100)}%)</span></div>
+    <div class="funnel-row"><span class="f-label">看到结果</span><div class="f-track"><div class="f-fill" style="background:var(--green);width:${completed/totalVisits*100}%"></div></div><span class="f-val">${completed}人 (${Math.round(completed/totalVisits*100)}%)</span></div>
+    <div class="funnel-row"><span class="f-label">点击分享</span><div class="f-track"><div class="f-fill" style="background:var(--accent);width:${shared/totalVisits*100}%"></div></div><span class="f-val">${shared}人 (${Math.round(shared/totalVisits*100)}%)</span></div>
+  `;
+  document.getElementById('funnel-wrap').innerHTML = funnelHtml;
   
-  // 各题流失分布
-  const dropByQ = new Array(10).fill(0);
-  const reachByQ = new Array(10).fill(0);
-  sArr.forEach(s => {
-    // 查找 drop 事件
-    const drop = s.find(e => e.event === 'drop');
-    if(drop && drop.at_q !== undefined) {
-      dropByQ[Math.min(drop.at_q, 9)]++;
-    }
-    // 计算到达每题的人数
-    const answers = s.filter(e => e.event === 'q_answer');
-    const maxQ = answers.length ? Math.max(...answers.map(e => e.q || 0)) : -1;
-    for(let q = 0; q <= maxQ && q < 10; q++) reachByQ[q]++;
+  // 结果分布
+  const resultCount = new Array(6).fill(0);
+  events.filter(e => e.event === 'result_view' && e.data && e.data.winner).forEach(e => {
+    const idx = AI_NAMES.indexOf(e.data.winner);
+    if (idx >= 0) resultCount[idx]++;
   });
+  const totalResults = resultCount.reduce((a, b) => a + b, 0) || 1;
+  const aiDistHtml = resultCount.map((c, i) => `
+    <div class="ai-row">
+      <span class="ai-name">${AI_NAMES[i]}</span>
+      <div class="ai-track"><div class="ai-fill" style="background:${AI_COLORS[i]};width:${c/totalResults*100}%"></div></div>
+      <span class="ai-pct">${Math.round(c/totalResults*100)}% (${c})</span>
+    </div>
+  `).join('');
+  document.getElementById('ai-dist').innerHTML = aiDistHtml || '<div class="empty-state">暂无结果</div>';
   
-  const maxDrop = Math.max(...dropByQ, 1);
-  let dHtml = '', dlHtml = '';
-  dropByQ.forEach((d, i) => {
-    const pct = reachByQ[i] ? Math.round(d / reachByQ[i] * 100) : 0;
-    const h = Math.round(d / maxDrop * 80) + 4;
-    const color = pct > 30 ? 'var(--red)' : (pct > 15 ? 'var(--accent)' : 'var(--surface2)');
-    dHtml += `<div class="bar-col" style="height:${h}px;background:${color};" data-tip="Q${i+1}: ${d}人流失 (${pct}%)"></div>`;
-    dlHtml += `<span class="bar-lbl">Q${i+1}</span>`;
+  // 分享方式
+  const shareMethods = { copy: 0, link: 0, weibo: 0, screenshot: 0 };
+  events.filter(e => e.event === 'share_click' && e.data && e.data.method).forEach(e => {
+    const m = e.data.method;
+    if (shareMethods[m] !== undefined) shareMethods[m]++;
   });
-  const dropChart = document.getElementById('drop-chart');
-  const dropLabels = document.getElementById('drop-labels');
-  if(dropChart) dropChart.innerHTML = dHtml;
-  if(dropLabels) dropLabels.innerHTML = dlHtml;
-  
-  const wQ = dropByQ.indexOf(Math.max(...dropByQ));
-  const dropInsight = document.getElementById('drop-insight');
-  if(dropInsight) {
-    dropInsight.textContent = dropByQ[wQ] > 0 ? 
-      `最高流失：Q${wQ+1}（${dropByQ[wQ]}人流失），建议重点检查该题` : 
-      '暂无足够流失数据';
-  }
-  
-  // AI 结果分布
-  const rDist = new Array(6).fill(0);
-  events.filter(e => e.event === 'result_view' && e.winner).forEach(e => {
-    const idx = aiNames.indexOf(e.winner);
-    if(idx >= 0) rDist[idx]++;
-  });
-  const rTotal = rDist.reduce((a, b) => a + b, 0) || 1;
-  const aiDistDiv = document.getElementById('ai-dist');
-  if(aiDistDiv) {
-    aiDistDiv.innerHTML = rDist.map((n, i) => ({n, i}))
-      .sort((a, b) => b.n - a.n)
-      .map(({n, i}) => `
-        <div class="ai-row">
-          <span class="ai-name">${aiNames[i]}</span>
-          <div class="ai-track"><div class="ai-fill" style="background:${aiColors[i]};width:${Math.round(n / rTotal * 100)}%"></div></div>
-          <span class="ai-pct">${Math.round(n / rTotal * 100)}%</span>
-        </div>
-      `).join('');
-  }
-  
-  // 各题平均思考时长
-  const timeByQ = Array.from({length: 10}, () => []);
-  events.filter(e => e.event === 'q_answer' && e.time_ms && e.time_ms < 120000).forEach(e => {
-    const qIdx = e.q || 0;
-    if(qIdx >= 0 && qIdx < 10) timeByQ[qIdx].push(e.time_ms);
-  });
-  const avgByQ = timeByQ.map(a => a.length ? Math.round(a.reduce((s, v) => s + v, 0) / a.length / 1000) : 0);
-  const maxT = Math.max(...avgByQ, 1);
-  let tHtml = '', tlHtml = '';
-  avgByQ.forEach((t, i) => {
-    tHtml += `<div class="bar-col" style="height:${Math.round(t / maxT * 80) + 4}px;background:var(--blue);opacity:0.7;" data-tip="Q${i+1}: ${t}秒"></div>`;
-    tlHtml += `<span class="bar-lbl">Q${i+1}</span>`;
-  });
-  const timeChart = document.getElementById('time-chart');
-  const timeLabels = document.getElementById('time-labels');
-  if(timeChart) timeChart.innerHTML = tHtml;
-  if(timeLabels) timeLabels.innerHTML = tlHtml;
-  
-  const sQ = avgByQ.indexOf(Math.max(...avgByQ));
-  const timeInsight = document.getElementById('time-insight');
-  if(timeInsight) {
-    timeInsight.textContent = avgByQ[sQ] > 0 ? 
-      `Q${sQ+1} 思考最久（${avgByQ[sQ]}秒），可能是题目引发了共鸣或困惑` : 
-      '暂无时长数据';
-  }
-  
-  // 分享方式分布
-  const sDist = {};
-  SHARE_METHODS.forEach(m => sDist[m] = 0);
-  events.filter(e => e.event === 'share_click' && e.method).forEach(e => {
-    if(sDist[e.method] !== undefined) sDist[e.method]++;
-  });
-  const sharePills = document.getElementById('share-pills');
-  if(sharePills) {
-    sharePills.innerHTML = SHARE_METHODS.map((m, i) => `
-      <div class="share-pill">
-        <div class="share-pill-val">${sDist[m]}</div>
-        <div class="share-pill-lbl">${SHARE_LABELS[i]}</div>
-      </div>
-    `).join('');
-  }
-  
-  // 选项热力图
-  const optDist = Array.from({length: 10}, () => [0, 0, 0, 0]);
-  events.filter(e => e.event === 'q_answer' && e.opt !== undefined && e.opt >= 0 && e.opt < 4).forEach(e => {
-    const qIdx = e.q || 0;
-    if(qIdx >= 0 && qIdx < 10) optDist[qIdx][e.opt]++;
-  });
-  const optColors = ['var(--blue)', 'var(--green)', 'var(--accent)', 'var(--purple)'];
-  const optHeatmap = document.getElementById('opt-heatmap');
-  if(optHeatmap) {
-    optHeatmap.innerHTML = optDist.map((row, qi) => {
-      const total = row.reduce((a, b) => a + b, 0) || 1;
-      return `<div class="hm-row">
-        <span class="hm-q">Q${qi+1}</span>
-        ${row.map((n, oi) => `<div class="hm-seg" style="flex:${Math.max(n, 0.5)};background:${optColors[oi]};opacity:${0.25 + n/total * 0.75};" title="${['A','B','C','D'][oi]}: ${Math.round(n/total*100)}% (${n})"></div>`).join('')}
-      </div>`;
-    }).join('');
-  }
+  const sharePillsHtml = `
+    <div class="share-pill"><div class="share-pill-val">${shareMethods.copy}</div><div class="share-pill-lbl">复制文字</div></div>
+    <div class="share-pill"><div class="share-pill-val">${shareMethods.link}</div><div class="share-pill-lbl">复制链接</div></div>
+    <div class="share-pill"><div class="share-pill-val">${shareMethods.weibo}</div><div class="share-pill-lbl">微博</div></div>
+    <div class="share-pill"><div class="share-pill-val">${shareMethods.screenshot}</div><div class="share-pill-lbl">截图</div></div>
+  `;
+  document.getElementById('share-pills').innerHTML = sharePillsHtml;
   
   // 最近会话表格
-  const recent = sArr.slice(-50).reverse();
-  const sessBody = document.getElementById('sess-body');
-  if(sessBody) {
-    sessBody.innerHTML = recent.map(s => {
-      const pv = s.find(e => e.event === 'page_view');
-      const result = s.find(e => e.event === 'result_view');
-      const share = s.find(e => e.event === 'share_click');
-      const drop = s.find(e => e.event === 'drop');
-      const ts = pv && pv.created_at ? 
-        new Date(pv.created_at).toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}) : 
-        (pv && pv.ts ? new Date(pv.ts).toLocaleString() : '—');
-      const status = result ? 
-        '<span class="badge badge-done">完成</span>' : 
-        (drop ? `<span class="badge badge-drop">流失Q${(drop.at_q || 0) + 1}</span>` : 
-        '<span class="badge badge-view">浏览</span>');
-      const ua = pv && pv.ua ? (/iPhone|Android/i.test(pv.ua) ? '📱 手机' : '💻 桌面') : '—';
-      const shareMethod = share ? share.method : '—';
-      const resultWinner = result ? result.winner : '—';
-      const totalTime = result && result.total_ms ? Math.round(result.total_ms / 1000) + 's' : '—';
-      return `<tr>
-        <td>${ts}</td>
-        <td>${status}</td>
-        <td style="color:var(--accent)">${resultWinner}</td>
-        <td>${shareMethod}</td>
-        <td>${totalTime}</td>
-        <td>${ua}</td>
-      </tr>`;
-    }).join('') || '<tr><td colspan="6" style="color:var(--text-faint);padding:24px 0;text-align:center;">暂无数据</td></tr>';
-  }
+  const recentSessions = sessionList.slice(-30).reverse();
+  const sessHtml = recentSessions.map(s => {
+    const pageView = s.find(e => e.event === 'page_view');
+    const result = s.find(e => e.event === 'result_view');
+    const share = s.find(e => e.event === 'share_click');
+    const time = pageView?.created_at ? new Date(pageView.created_at).toLocaleString() : '—';
+    const status = result ? '<span class="badge badge-done">完成</span>' : '<span class="badge badge-view">浏览</span>';
+    const winner = result?.data?.winner || '—';
+    const shareMethod = share?.data?.method || '—';
+    const duration = result?.data?.total_ms ? Math.round(result.data.total_ms / 1000) + 's' : '—';
+    return `<tr><td>${time}</td><td>${status}</td><td style="color:var(--accent)">${winner}</td><td>${shareMethod}</td><td>${duration}</td></tr>`;
+  }).join('');
+  document.getElementById('sess-body').innerHTML = sessHtml || '<tr><td colspan="5" style="padding:40px;text-align:center;">暂无数据</td></tr>';
   
-  // 保存统计数据供 AI 分析使用
-  currentStats = {
-    pvS, startedCount: startedS.length, completedCount: completedS.length, 
-    sharedCount: sharedS.length, cr, sr, avgT, dropByQ, reachByQ, avgByQ, 
-    rDist, sDist, optDist, wQ, sQ
-  };
+  // 各题流失
+  const dropByQ = new Array(10).fill(0);
+  sessionList.forEach(s => {
+    const answers = s.filter(e => e.event === 'q_answer').sort((a, b) => (a.data?.q || 0) - (b.data?.q || 0));
+    for (let i = 0; i < answers.length - 1; i++) {
+      const q1 = answers[i].data?.q || 0;
+      const q2 = answers[i+1].data?.q || 0;
+      if (q2 - q1 > 1) {
+        for (let j = q1 + 1; j < q2; j++) dropByQ[j]++;
+      }
+    }
+    if (answers.length > 0 && answers.length < 10) {
+      const lastQ = answers[answers.length-1].data?.q || 0;
+      if (lastQ < 9) dropByQ[lastQ + 1]++;
+    }
+  });
+  const maxDrop = Math.max(...dropByQ, 1);
+  let dropHtml = '', dropLabelHtml = '';
+  dropByQ.forEach((d, i) => {
+    const h = Math.max(4, Math.round(d / maxDrop * 80));
+    dropHtml += `<div class="bar-col" style="height:${h}px;background:${d > 5 ? 'var(--red)' : 'var(--accent)'}" data-tip="Q${i+1}: ${d}人流失"></div>`;
+    dropLabelHtml += `<span class="bar-lbl">Q${i+1}</span>`;
+  });
+  document.getElementById('drop-chart').innerHTML = dropHtml;
+  document.getElementById('drop-labels').innerHTML = dropLabelHtml;
+  const maxDropIdx = dropByQ.indexOf(Math.max(...dropByQ));
+  document.getElementById('drop-insight').textContent = maxDropIdx >= 0 ? `⚠️ 流失最严重：Q${maxDropIdx+1}（${dropByQ[maxDropIdx]}人流失）` : '暂无流失数据';
+  
+  // 各题时长
+  const timeByQ = Array.from({ length: 10 }, () => []);
+  events.filter(e => e.event === 'q_answer' && e.data && e.data.time_ms).forEach(e => {
+    const q = e.data.q || 0;
+    if (q >= 0 && q < 10) timeByQ[q].push(e.data.time_ms);
+  });
+  const avgByQ = timeByQ.map(arr => arr.length ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length / 1000) : 0);
+  const maxTime = Math.max(...avgByQ, 1);
+  let timeHtml = '', timeLabelHtml = '';
+  avgByQ.forEach((t, i) => {
+    const h = Math.max(4, Math.round(t / maxTime * 80));
+    timeHtml += `<div class="bar-col" style="height:${h}px;background:var(--blue);opacity:0.7" data-tip="Q${i+1}: ${t}秒"></div>`;
+    timeLabelHtml += `<span class="bar-lbl">Q${i+1}</span>`;
+  });
+  document.getElementById('time-chart').innerHTML = timeHtml;
+  document.getElementById('time-labels').innerHTML = timeLabelHtml;
+  const maxTimeIdx = avgByQ.indexOf(Math.max(...avgByQ));
+  document.getElementById('time-insight').textContent = maxTimeIdx >= 0 ? `⏱️ 思考最久：Q${maxTimeIdx+1}（${avgByQ[maxTimeIdx]}秒）` : '暂无时长数据';
+  
+  // 选项热力
+  const optDist = Array.from({ length: 10 }, () => [0, 0, 0, 0]);
+  events.filter(e => e.event === 'q_answer' && e.data && e.data.opt !== undefined).forEach(e => {
+    const q = e.data.q || 0;
+    const opt = e.data.opt;
+    if (q >= 0 && q < 10 && opt >= 0 && opt < 4) optDist[q][opt]++;
+  });
+  const optHeatHtml = optDist.map((row, qi) => {
+    const total = row.reduce((a, b) => a + b, 0) || 1;
+    return `<div class="hm-row">
+      <span class="hm-q">Q${qi+1}</span>
+      ${row.map((n, oi) => `<div class="hm-seg" style="flex:${Math.max(n, 0.5)};background:${['#5a9ae0','#4ec994','#d4a853','#9a7ee0'][oi]};opacity:${0.3 + n/total*0.7}" title="${['A','B','C','D'][oi]}: ${Math.round(n/total*100)}%"></div>`).join('')}
+    </div>`;
+  }).join('');
+  document.getElementById('opt-heatmap').innerHTML = optHeatHtml || '<div class="empty-state">暂无数据</div>';
 }
 
-// ══ AI 分析（占位，需要时再接入真实 API）══
-async function runAnalysis(){
+async function runAnalysis() {
   const btn = document.getElementById('analyze-btn');
   const box = document.getElementById('analysis-box');
   const textEl = document.getElementById('analysis-text');
-  if(!currentStats){
-    alert('暂无数据，请等有用户访问后再分析');
+  
+  if (!rawEvents.length) {
+    alert('暂无数据，请先完成一次测试');
     return;
   }
+  
   btn.disabled = true;
-  btn.textContent = '分析中…';
+  btn.textContent = '分析中...';
   box.style.display = 'block';
-  textEl.innerHTML = '正在分析数据...<span class="analysis-cursor"></span>';
+  textEl.innerHTML = '正在分析数据...';
   
-  const s = currentStats;
-  const qNames = ["手机没电","领导周末汇报","路过奶茶店","励志视频","朋友圈月薪","独自生病","两周没打扫","地铁好看的人","超市漫游","凌晨两点"];
+  const completed = rawEvents.filter(e => e.event === 'result_view').length;
+  const started = rawEvents.filter(e => e.event === 'quiz_start').length;
+  const cr = started ? Math.round(completed / started * 100) : 0;
   
-  const analysisText = `📊 数据快照
+  const analysis = `📊 当前数据快照
 
-【核心漏斗】
-总访问: ${s.pvS}人
-开始答题: ${s.startedCount}人
-完成测试: ${s.completedCount}人 (完成率 ${s.cr}%)
-分享次数: ${s.sharedCount}次 (分享率 ${s.sr}%)
-平均答题时长: ${s.avgT}秒
+📈 核心指标
+• 总访问会话: ${Object.keys(rawEvents.reduce((s,e)=>e.session?(s[e.session]=1,s):s,{})).length}
+• 开始答题: ${started} 人
+• 完成测试: ${completed} 人
+• 完成率: ${cr}%
+• 分享次数: ${rawEvents.filter(e => e.event === 'share_click').length}
 
-【各题流失率】
-${s.dropByQ.map((d,i) => `Q${i+1}「${qNames[i]}」: 流失 ${d}人 (${s.reachByQ[i] ? Math.round(d/s.reachByQ[i]*100) : 0}%)`).join('\n')}
+💡 快速建议
+${cr < 50 ? '1. 完成率偏低，建议检查第3-5题是否有歧义或过长\n' : '1. 完成率良好，可以开始优化分享引导\n'}
+2. 在结果页增加更明显的分享按钮
+3. 考虑在流失较高的题目增加趣味性提示
 
-【各题平均思考时长】
-${s.avgByQ.map((t,i) => `Q${i+1}: ${t}秒`).join(' | ')}
-
-【结果分布】
-${aiNames.map((n,i) => `${n}: ${s.rDist[i]}人`).join(' / ')}
-
-【分享方式】
-复制:${s.sDist.copy||0} 链接:${s.sDist.link||0} 微博:${s.sDist.weibo||0} 截图:${s.sDist.screenshot||0}
-
----
-
-📝 分析结论：
-
-1. 完成率诊断
-当前完成率为 ${s.cr}%，${s.cr >= 60 ? '处于较好水平' : (s.cr >= 40 ? '处于中等水平，有提升空间' : '偏低，需要优化')}。
-${s.wQ !== undefined && s.dropByQ[s.wQ] > 0 ? `流失最严重的是 Q${s.wQ+1}「${qNames[s.wQ]}」，流失 ${s.dropByQ[s.wQ]} 人，流失率 ${Math.round(s.dropByQ[s.wQ]/s.reachByQ[s.wQ]*100)}%。` : ''}
-
-2. 分享率诊断
-当前分享率为 ${s.sr}%，${s.sr >= 20 ? '分享意愿不错，用户有传播动力' : '分享率偏低，需要加强引导'}。
-最受欢迎的分享方式是 ${(()=>{let maxM='复制',maxV=0;for(let m of ['copy','link','weibo','screenshot'])if(s.sDist[m]>maxV){maxV=s.sDist[m];maxM={copy:'复制文字',link:'复制链接',weibo:'微博',screenshot:'截图'}[m];}return maxV>0?maxM:'暂无';})()}。
-
-3. 迭代建议
-• 针对高流失题目优化选项表述或增加趣味性
-• 在结果页增加更明显的分享引导按钮
-• 考虑缩短题目数量或增加进度提示以提升完成率
-
-详细分析请结合具体业务场景进行。`;
-
-  // 模拟打字效果
-  textEl.innerHTML = '';
-  let i = 0;
-  const cursor = document.createElement('span');
-  cursor.className = 'analysis-cursor';
-  textEl.appendChild(cursor);
-  const timer = setInterval(() => {
-    if(i < analysisText.length){
-      textEl.insertBefore(document.createTextNode(analysisText[i]), cursor);
-      i++;
-    } else {
-      clearInterval(timer);
-      cursor.remove();
-      document.getElementById('v12-item').style.opacity = '1';
-      document.getElementById('v12-desc').textContent = '根据AI分析结果确定迭代方向，查看上方"分析结论"部分。';
-    }
-  }, 20);
+需要更详细的分析请查看上方各模块数据。`;
   
+  textEl.innerHTML = analysis;
   btn.disabled = false;
-  btn.textContent = '重新分析 →';
-}
-
-function clearLocalData(){
-  if(confirm('清空本机 localStorage 缓存数据？Supabase 云端数据不受影响。')){
-    localStorage.removeItem(LOCAL_KEY);
-    loadData();
-  }
+  btn.textContent = '📊 用 AI 分析数据，生成迭代建议';
 }
 </script>
 </body>
